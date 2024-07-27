@@ -1,25 +1,52 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
-
-
-from dash import Dash, html, dcc
-import plotly.express as px
+from dash import html,dash,dcc,Input,Output,callback
 import pandas as pd
+import plotly.express as px
+import numpy as np
 
-app = Dash(__name__)
+app = dash.Dash(__name__)
 
-data = pd.read_csv(r'.\final_file.csv')
+file = pd.read_csv(r'.\final_file.csv')
 
-plot_1 = px.line(data, x='date', y='sales')
+app.layout = html.Div([
+    html.Div([
+        html.Label('Select Region'),
+        dcc.RadioItems(np.append(file["region"].unique(),'all'), 'north', id='region')
+    ],style={
+        'width':'10%',
+        'border':'2px solid black',
+        'border-radius':'15px',
+        'padding':'20px',
+    }
+    ),
+    dcc.Graph(id='region-graph')
+], style={'background-color':'#2560CF'}
+)
 
-app.layout = html.Div(children = [
-    html.H1(children = 'Sales of Soul\'s Food (Pink Morsel)',
-            style  = {'textAlign' : 'center'}),
-    dcc.Graph(
-        id = 'Line-Chart',
-        figure = plot_1
+@callback(
+    Output('region-graph', 'figure'),
+    Input('region', 'value')
+)
+def update_graph(region):
+    if region == 'all':
+        df = file
+    else:    
+        df = file[file['region'] == region]
+        
+    fig = px.line(df, x='date',y='sales')
+    fig.update_traces(line=dict(color='#5BB6FF'))
+    
+    fig.update_layout(
+    plot_bgcolor='#2560CF', 
+    paper_bgcolor='#2560CF',
+    xaxis=dict(
+        showgrid=False,
+    ),
+    yaxis=dict(
+        gridcolor='black',
+        gridwidth=2
     )
-])
+    )   
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
