@@ -8,19 +8,25 @@ app = dash.Dash(__name__)
 file = pd.read_csv(r'.\final_file.csv')
 
 app.layout = html.Div([
+    html.H1(children='Hello Dash', id='header',style={'color': 'black','text-align':'center'}),
     html.Div([
+        dcc.Graph(id='region-graph', style={'flex':'1'}),
+        html.Div([
         html.Label('Select Region'),
         dcc.RadioItems(np.append(file["region"].unique(),'all'), 'north', id='region')
+        ],style={
+            'width':'150px',
+            'border':'2px solid black',
+            'border-radius':'15px',
+            'padding':'1%',
+            'height':'fitContent',
+            'margin-right':'20px'}
+        )
     ],style={
-        'width':'10%',
-        'border':'2px solid black',
-        'border-radius':'15px',
-        'padding':'20px',
-    }
-    ),
-    dcc.Graph(id='region-graph')
-], style={'background-color':'#2560CF'}
-)
+        'display':'flex',
+        'flexDirection':'row',
+        'alignItems': 'flex-start'})
+],style={'background-color':'#2560CF'})
 
 @callback(
     Output('region-graph', 'figure'),
